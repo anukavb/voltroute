@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import MapView, { Marker, Polyline, PROVIDER_DEFAULT } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { evaluateOrderSafety } from '../logic/smartAccept';
 import { buildRoutePolyline } from '../logic/routing';
@@ -27,9 +26,7 @@ export default function MapComponent({ activeOrder, batteryPercentage, onDriverL
     let isMounted = true;
 
     async function startWatching() {
-      console.log('[MapComponent] Requesting permission...');
       const { status } = await Location.requestForegroundPermissionsAsync();
-      console.log('[MapComponent] Permission status:', status);
       if (!isMounted) return;
 
       if (status !== 'granted') {
@@ -41,15 +38,12 @@ export default function MapComponent({ activeOrder, batteryPercentage, onDriverL
       setPermissionStatus('granted');
 
       try {
-        console.log('[MapComponent] Fetching initial position...');
         const initial = await Location.getCurrentPositionAsync({});
-        console.log('[MapComponent] Initial position:', initial.coords);
         if (!isMounted) return;
         const coords = { latitude: initial.coords.latitude, longitude: initial.coords.longitude };
         setDriverLocation(coords);
         onDriverLocation?.(coords);
       } catch (e) {
-        console.log('[MapComponent] Initial position FAILED:', e.message);
         setErrorMsg('Could not get initial position: ' + e.message);
       }
 
@@ -63,7 +57,6 @@ export default function MapComponent({ activeOrder, batteryPercentage, onDriverL
             onDriverLocation?.(coords);
           }
         );
-        console.log('[MapComponent] Watch subscription started');
       } catch (e) {
         console.log('[MapComponent] Watch subscription FAILED:', e.message);
       }
@@ -102,7 +95,6 @@ export default function MapComponent({ activeOrder, batteryPercentage, onDriverL
 
     fetchRoadRoute(waypoints.points).then((route) => {
       if (cancelled) return;
-      console.log('[MapComponent] Road route result:', route ? `${route.points.length} points` : 'null');
       if (route) {
         setRoadRoute(route);
       } else {
@@ -173,37 +165,26 @@ export default function MapComponent({ activeOrder, batteryPercentage, onDriverL
           longitudeDelta: 0.02,
         }}
       >
-        <Marker coordinate={driverLocation} title="You" anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={false}>
-          <View style={styles.driverPin} collapsable={false}>
-            <MaterialCommunityIcons name="moped" size={18} color="#fff" />
-          </View>
-        </Marker>
+        {/* Driver marker — ALWAYS rendered, unconditional, regardless of activeOrder */}
+        <Marker coordinate={driverLocation} title="You" pinColor="#2E7D32" />
 
+        {/* Home marker — only when an order is active */}
         {activeOrder && (
           <Marker
             coordinate={{ latitude: activeOrder.latitude, longitude: activeOrder.longitude }}
             title={activeOrder.homeLabel || activeOrder.label}
             description={`₹${activeOrder.payout} · ${activeOrder.distanceKm} km`}
-            anchor={{ x: 0.5, y: 1 }}
-            tracksViewChanges={false}
-          >
-            <View style={styles.homePin} collapsable={false}>
-              <Ionicons name="home" size={18} color="#fff" />
-            </View>
-          </Marker>
+            pinColor="#FF5252"
+          />
         )}
 
+        {/* Kiosk marker — only when a swap is required for the active order */}
         {swapStationUsed && (
           <Marker
             coordinate={{ latitude: swapStationUsed.latitude, longitude: swapStationUsed.longitude }}
             title={swapStationUsed.label}
-            anchor={{ x: 0.5, y: 1 }}
-            tracksViewChanges={false}
-          >
-            <View style={styles.kioskPin} collapsable={false}>
-              <Ionicons name="flash" size={18} color="#fff" />
-            </View>
-          </Marker>
+            pinColor="#F9A825"
+          />
         )}
 
         {visiblePolylinePoints.length > 1 && (
@@ -220,20 +201,23 @@ export default function MapComponent({ activeOrder, batteryPercentage, onDriverL
       <TouchableOpacity
         style={[styles.recentreBtn, { bottom: activeOrder ? 90 : 20 }]}
         onPress={() => {
-          if (mapRef.current && driverLocation) {
-            mapRef.current.animateToRegion(
-              {
-                latitude: driverLocation.latitude,
-                longitude: driverLocation.longitude,
-                latitudeDelta: 0.02,
-                longitudeDelta: 0.02,
-              },
-              500
-            );
+          if (!mapRef.current) return;
+          if (roadRoute && roadRoute.points.length > 1) {
+            mapRef.current.fitToCoordinates(roadRoute.points, {
+              edgePadding: { top: 80, right: 60, bottom: 150, left: 60 },
+              animated: true,
+            });
+          } else if (driverLocation) {
+            mapRef.current.animateToRegion({
+              latitude: driverLocation.latitude,
+              longitude: driverLocation.longitude,
+              latitudeDelta: 0.02,
+              longitudeDelta: 0.02,
+            }, 500);
           }
         }}
       >
-        <Ionicons name="locate" size={22} color="#2E7D32" />
+        <Text style={styles.recentreIcon}>◎</Text>
       </TouchableOpacity>
 
       {activeOrder && (
@@ -299,25 +283,5 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
-  driverPin: {
-    backgroundColor: '#2E7D32',
-    borderRadius: 20,
-    padding: 8,
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  homePin: {
-    backgroundColor: '#FF5252',
-    borderRadius: 20,
-    padding: 8,
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  kioskPin: {
-    backgroundColor: '#F9A825',
-    borderRadius: 20,
-    padding: 8,
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
+  recentreIcon: { fontSize: 20, color: '#2E7D32' },
 });

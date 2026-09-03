@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { useFonts } from 'expo-font';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+//import { useFonts } from 'expo-font';
+//import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import MapComponent from './src/components/MapComponent';
 import { useBatterySim } from './src/hooks/useBatterySim';
@@ -17,19 +17,6 @@ export default function App() {
   const [driverCoords, setDriverCoords] = useState(null);
 
   const activeOrder = DELIVERY_DESTINATIONS.find((o) => o.id === activeOrderId) || null;
-
-  const [fontsLoaded] = useFonts({
-  ...Ionicons.font,
-  ...MaterialCommunityIcons.font,
-  });
-
-  if (!fontsLoaded) {
-    return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Loading…</Text>
-    </View>
-   );
-  }
 
   return (
     <View style={styles.container}>
