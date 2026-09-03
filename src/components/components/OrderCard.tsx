@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import type { Order, OrderStatus } from '../types';
 import { COLORS } from '../data';
+import { useTheme } from '../../theme/ThemeContext';
 
 const STATUS_CONFIG: Record<OrderStatus, { bg: string; text: string }> = {
   Pending:    { bg: '#F0F1F5', text: COLORS.textMuted },
@@ -14,14 +15,15 @@ interface OrderCardProps {
 }
 
 export default function OrderCard({ order }: OrderCardProps) {
+  const { theme } = useTheme();
   const pill = STATUS_CONFIG[order.status];
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border, borderWidth: 1 }]}>
       {/* Top row: ID + status pill */}
       <View style={styles.topRow}>
-        <Text style={styles.orderId}>{order.id}</Text>
-        <View style={[styles.pill, { backgroundColor: pill.bg }]}>
+        <Text style={[styles.orderId, { color: theme.textSecondary }]}>{order.id}</Text>
+        <View style={[styles.pill, { backgroundColor: theme.card, borderColor: theme.border, borderWidth: 1 }]}>
           <Text style={[styles.pillText, { color: pill.text }]}>{order.status}</Text>
         </View>
       </View>
@@ -29,22 +31,22 @@ export default function OrderCard({ order }: OrderCardProps) {
       {/* Route connector */}
       <View style={styles.routeRow}>
         <View style={styles.connector}>
-          <View style={[styles.connectorDot, { borderColor: COLORS.blue }]} />
+          <View style={[styles.connectorDot, { borderColor: theme.accentSecondary }]} />
           <View style={styles.connectorLine} />
           <View style={styles.connectorLine} />
           <View style={styles.connectorLine} />
-          <View style={[styles.connectorDot, { backgroundColor: COLORS.red, borderColor: COLORS.red }]} />
+          <View style={[styles.connectorDot, { backgroundColor: theme.accentWarning, borderColor: theme.accentWarning }]} />
         </View>
         <View style={styles.addresses}>
-          <Text style={styles.addressText} numberOfLines={1}>{order.pickup}</Text>
-          <Text style={styles.addressText} numberOfLines={1}>{order.drop}</Text>
+          <Text style={[styles.addressText, { color: theme.textPrimary }]} numberOfLines={1}>{order.pickup}</Text>
+          <Text style={[styles.addressText, { color: theme.textPrimary }]} numberOfLines={1}>{order.drop}</Text>
         </View>
       </View>
 
       {/* Bottom row: distance + payout */}
       <View style={styles.bottomRow}>
-        <Text style={styles.distance}>{order.distance}</Text>
-        <Text style={styles.payout}>{order.payout}</Text>
+        <Text style={[styles.distance, { color: theme.textSecondary }]}>{order.distance}</Text>
+        <Text style={[styles.payout, { color: theme.textPrimary }]}>{order.payout}</Text>
       </View>
     </View>
   );

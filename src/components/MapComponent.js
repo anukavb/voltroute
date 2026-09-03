@@ -9,10 +9,12 @@ import { evaluateOrderSafety } from '../logic/smartAccept';
 import { buildRoutePolyline } from '../logic/routing';
 import { fetchRoadRoute } from '../services/routingService';
 import { SWAP_STATIONS } from '../data/orders';
+import { useTheme } from '../theme/ThemeContext';
 
 const REVEAL_STEP_MS = 30;
 
 export default function MapComponent({ activeOrder, batteryPercentage, onDriverLocation }) {
+  const { theme } = useTheme();
   const [driverLocation, setDriverLocation] = useState(null);
   const [permissionStatus, setPermissionStatus] = useState('checking');
   const [errorMsg, setErrorMsg] = useState(null);
@@ -142,25 +144,25 @@ export default function MapComponent({ activeOrder, batteryPercentage, onDriverL
 
   if (permissionStatus === 'checking') {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.infoText}>Requesting location permission…</Text>
+      <View style={[styles.centered, { backgroundColor: theme.background }]}>
+        <Text style={[styles.infoText, { color: theme.textSecondary }]}>Requesting location permission…</Text>
       </View>
     );
   }
 
   if (permissionStatus === 'denied') {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>{errorMsg}</Text>
+      <View style={[styles.centered, { backgroundColor: theme.background }]}>
+        <Text style={[styles.errorText, { color: theme.accentWarning }]}>{errorMsg}</Text>
       </View>
     );
   }
 
   if (!driverLocation) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.infoText}>Getting current position…</Text>
-        {errorMsg && <Text style={styles.errorText}>{errorMsg}</Text>}
+      <View style={[styles.centered, { backgroundColor: theme.background }]}>
+        <Text style={[styles.infoText, { color: theme.textSecondary }]}>Getting current position…</Text>
+        {errorMsg && <Text style={[styles.errorText, { color: theme.accentWarning }]}>{errorMsg}</Text>}
       </View>
     );
   }
@@ -181,14 +183,14 @@ export default function MapComponent({ activeOrder, batteryPercentage, onDriverL
           longitudeDelta: 0.02,
         }}
       >
-        <Marker coordinate={driverLocation} title="You" pinColor="#2E7D32" />
+        <Marker coordinate={driverLocation} title="You" pinColor={theme.accentPositive} />
 
         {activeOrder && (
           <Marker
             coordinate={{ latitude: activeOrder.latitude, longitude: activeOrder.longitude }}
             title={activeOrder.homeLabel}
             description={`₹${activeOrder.payout} · ${activeOrder.distanceKm} km`}
-            pinColor="#FF5252"
+            pinColor={theme.accentWarning}
           />
         )}
 
@@ -196,14 +198,14 @@ export default function MapComponent({ activeOrder, batteryPercentage, onDriverL
           <Marker
             coordinate={{ latitude: swapStationUsed.latitude, longitude: swapStationUsed.longitude }}
             title={swapStationUsed.label}
-            pinColor="#F9A825"
+            pinColor={theme.accentCaution}
           />
         )}
 
         {visiblePolylinePoints.length > 1 && (
           <Polyline
             coordinates={visiblePolylinePoints}
-            strokeColor={swapRequired ? '#F9A825' : '#2E7D32'}
+            strokeColor={swapRequired ? theme.accentCaution : theme.accentPositive}
             strokeWidth={5}
             lineCap="round"
             lineJoin="round"
@@ -234,14 +236,14 @@ export default function MapComponent({ activeOrder, batteryPercentage, onDriverL
       </TouchableOpacity>
 
       {activeOrder && (
-        <View style={styles.banner}>
-          <Text style={styles.bannerText}>
+        <View style={[styles.banner, { backgroundColor: theme.card, borderColor: theme.border }]}>
+          <Text style={[styles.bannerText, { color: theme.textPrimary }]}>
             {swapRequired
               ? `⚠ Battery swap needed en route to ${activeOrder.homeLabel}`
               : `✓ Sufficient charge for ${activeOrder.homeLabel}`}
           </Text>
           {roadRoute?.distanceMeters != null && roadRoute?.durationSeconds != null && (
-            <Text style={styles.bannerSubtext}>
+            <Text style={[styles.bannerSubtext, { color: theme.textSecondary }]}>
               {(roadRoute.distanceMeters / 1000).toFixed(1)} km · {Math.round(roadRoute.durationSeconds / 60)} min
             </Text>
           )}

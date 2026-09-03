@@ -1,8 +1,10 @@
 import React from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
-import { COLORS, kpis } from '../data';
+import { kpis } from '../data';
+import { useTheme } from '../../theme/ThemeContext';
 
 export default function KPIStrip() {
+  const { theme } = useTheme();
   return (
     <ScrollView
       horizontal
@@ -11,9 +13,9 @@ export default function KPIStrip() {
       style={styles.scroll}
     >
       {kpis.map((kpi) => (
-        <View key={kpi.label} style={styles.card}>
-          <Text style={styles.value}>{kpi.value}</Text>
-          <Text style={styles.label}>{kpi.label}</Text>
+        <View key={kpi.label} style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+          <Text style={[styles.value, { color: theme.accentPositive }]}>{kpi.value}</Text>
+          <Text style={[styles.label, { color: theme.textSecondary }]}>{kpi.label}</Text>
         </View>
       ))}
     </ScrollView>
@@ -30,7 +32,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   card: {
-    backgroundColor: COLORS.cardBg,
+    borderWidth: 1,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -44,14 +46,12 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 24,
     fontWeight: '800',
-    color: COLORS.greenDark,
     letterSpacing: -0.5,
     lineHeight: 28,
   },
   label: {
     fontSize: 10,
     fontWeight: '500',
-    color: COLORS.textMuted,
     marginTop: 3,
   },
 });

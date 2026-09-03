@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { NavTab } from '../types';
-import { COLORS } from '../data';
+import { useTheme } from '../../theme/ThemeContext';
 
 interface NavItem {
   id: NavTab;
@@ -24,8 +24,9 @@ interface BottomNavProps {
 }
 
 export default function BottomNav({ activeTab, onTabPress }: BottomNavProps) {
+  const { theme } = useTheme();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background, borderTopColor: theme.border }]}>
       {NAV_ITEMS.map((item) => {
         const isActive = activeTab === item.id;
         return (
@@ -37,9 +38,9 @@ export default function BottomNav({ activeTab, onTabPress }: BottomNavProps) {
             <Ionicons
               name={isActive ? item.iconActive : item.icon}
               size={22}
-              color={isActive ? COLORS.green : COLORS.textMuted}
+              color={isActive ? theme.accentPositive : theme.textSecondary}
             />
-            <Text style={[styles.label, isActive && styles.labelActive]}>
+            <Text style={[styles.label, { color: theme.textSecondary }, isActive && { color: theme.accentPositive }]}>
               {item.label}
             </Text>
           </Pressable>
@@ -52,12 +53,10 @@ export default function BottomNav({ activeTab, onTabPress }: BottomNavProps) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: COLORS.bg,
     paddingTop: 10,
     paddingBottom: 28,
     paddingHorizontal: 8,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: 'rgba(0,0,0,0.08)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.04,
@@ -74,9 +73,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 10,
     fontWeight: '500',
-    color: COLORS.textMuted,
   },
   labelActive: {
-    color: COLORS.green,
   },
 });

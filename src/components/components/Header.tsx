@@ -1,26 +1,17 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../data';
+import { useTheme } from '../../theme/ThemeContext';
 
-interface HeaderProps {
-  notificationCount?: number;
-}
-
-export default function Header({ notificationCount = 5 }: HeaderProps) {
+export default function Header() {
+  const { theme, isDark, toggleTheme } = useTheme();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.wordmark}>
-        <Text style={styles.wordmarkBold}>Live</Text>
-        <Text style={styles.wordmarkLight}> Ops</Text>
+        <Text style={[styles.wordmarkBold, { color: theme.textPrimary }]}>VoltRoute</Text>
       </View>
-      <Pressable style={styles.bellWrapper}>
-        <Ionicons name="notifications-outline" size={22} color={COLORS.textMuted} />
-        {notificationCount > 0 && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{notificationCount}</Text>
-          </View>
-        )}
+      <Pressable style={styles.bellWrapper} onPress={toggleTheme} accessibilityLabel="Toggle theme">
+        <Ionicons name={isDark ? 'sunny-outline' : 'moon-outline'} size={22} color={theme.textPrimary} />
       </Pressable>
     </View>
   );
@@ -34,7 +25,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 8,
     paddingBottom: 12,
-    backgroundColor: COLORS.bg,
   },
   wordmark: {
     flexDirection: 'row',
@@ -44,13 +34,11 @@ const styles = StyleSheet.create({
     fontFamily: 'System',
     fontSize: 22,
     fontWeight: '800',
-    color: COLORS.textDark,
     letterSpacing: -0.5,
   },
   wordmarkLight: {
     fontSize: 22,
     fontWeight: '400',
-    color: COLORS.textMuted,
     letterSpacing: -0.5,
   },
   bellWrapper: {
@@ -58,22 +46,5 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  badge: {
-    position: 'absolute',
-    top: 4,
-    right: 4,
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: COLORS.red,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badgeText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    lineHeight: 11,
   },
 });

@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ThemeProvider } from './theme/ThemeContext';
 import HomeScreen from './components/screens/HomeScreen';
 import DriverProfileScreen from './components/screens/DriverProfileScreen';
+import HistoryScreen from './components/screens/HistoryScreen';
+import AnalyticsScreen from './components/screens/AnalyticsScreen';
 import { useBatterySim } from './hooks/useBatterySim';
 import { ORDERS } from './data/orders';
 import type { AppScreen, NavTab } from './components/types';
@@ -32,6 +35,16 @@ export default function App() {
   }
 
   function handleTabPress(tab: NavTab) {
+    if (tab === 'history') {
+      setScreen('history');
+      setActiveTab('history');
+      return;
+    }
+    if (tab === 'analytics') {
+      setScreen('analytics');
+      setActiveTab('analytics');
+      return;
+    }
     if (tab === 'fleet') {
       setScreen('driver-profile');
       setActiveTab('fleet');
@@ -47,19 +60,21 @@ export default function App() {
   }
 
   return (
-    <SafeAreaProvider>
+    <ThemeProvider>
+      <SafeAreaProvider>
       <StatusBar style="dark" />
       {screen === 'home' ? (
         <HomeScreen
           activeTab={activeTab}
           onTabPress={handleTabPress}
-          activeDestination={activeDestination}
           batteryPercentage={battery}
-          drainNow={drainNow}
           driverLocation={driverLocation}
-          onDriverLocation={setDriverLocation}
           acceptedIds={acceptedIds}
         />
+      ) : screen === 'history' ? (
+        <HistoryScreen activeTab={activeTab} onTabPress={handleTabPress} />
+      ) : screen === 'analytics' ? (
+        <AnalyticsScreen activeTab={activeTab} onTabPress={handleTabPress} />
       ) : (
         <DriverProfileScreen
           onBack={handleBack}
@@ -69,12 +84,14 @@ export default function App() {
           activeOrder={activeDestination}
           drainNow={drainNow}
           driverLocation={driverLocation}
+          onDriverLocation={setDriverLocation}
           acceptedIds={acceptedIds}
           onAccept={handleAcceptOrder}
           onPreviewSwapRoute={handlePreviewSwapRoute}
           onConfirmHome={handleConfirmHome}
         />
       )}
-    </SafeAreaProvider>
+      </SafeAreaProvider>
+    </ThemeProvider>
   );
 }

@@ -1,7 +1,7 @@
 export type OrderStatus = 'Pending' | 'Assigned' | 'Picked Up';
 export type VehicleStatus = 'idle' | 'enroute' | 'lowbat' | 'offline';
 export type NavTab = 'home' | 'fleet' | 'history' | 'analytics';
-export type AppScreen = 'home' | 'driver-profile';
+export type AppScreen = 'home' | 'driver-profile' | 'history' | 'analytics';
 
 export interface Order {
   id: string;
