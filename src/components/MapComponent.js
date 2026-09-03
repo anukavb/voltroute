@@ -8,7 +8,7 @@ import * as Location from 'expo-location';
 import { evaluateOrderSafety } from '../logic/smartAccept';
 import { buildRoutePolyline } from '../logic/routing';
 import { fetchRoadRoute } from '../services/routingService';
-import { SWAP_STATIONS } from '../data/mockData';
+import { SWAP_STATIONS } from '../data/orders';
 
 const REVEAL_STEP_MS = 30;
 
@@ -98,13 +98,15 @@ export default function MapComponent({ activeOrder, batteryPercentage, onDriverL
       if (route) {
         setRoadRoute(route);
       } else {
+        console.warn('[MapComponent] OSRM fetch failed, falling back to straight line. Check network (wifi may block OSRM — try mobile data).');
         setRoadRoute({ points: waypoints.points, distanceMeters: null, durationSeconds: null });
       }
     });
 
     return () => { cancelled = true; };
-  }, [activeOrder?.id, swapRequired]);
+  }, [activeOrder?.id, swapRequired, driverLocation?.latitude, driverLocation?.longitude]);
 
+  // Reveal animation — draws the polyline progressively
   useEffect(() => {
     if (revealInterval.current) clearInterval(revealInterval.current);
     setRevealCount(0);
@@ -122,6 +124,20 @@ export default function MapComponent({ activeOrder, batteryPercentage, onDriverL
     }, REVEAL_STEP_MS);
 
     return () => clearInterval(revealInterval.current);
+  }, [roadRoute]);
+
+  // Auto-recentre the moment a new route arrives — fixes route-on-tap not drawing
+  useEffect(() => {
+    if (!roadRoute || roadRoute.points.length < 2 || !mapRef.current) return;
+
+    const timer = setTimeout(() => {
+      mapRef.current.fitToCoordinates(roadRoute.points, {
+        edgePadding: { top: 80, right: 60, bottom: 150, left: 60 },
+        animated: true,
+      });
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, [roadRoute]);
 
   if (permissionStatus === 'checking') {
@@ -165,20 +181,17 @@ export default function MapComponent({ activeOrder, batteryPercentage, onDriverL
           longitudeDelta: 0.02,
         }}
       >
-        {/* Driver marker — ALWAYS rendered, unconditional, regardless of activeOrder */}
         <Marker coordinate={driverLocation} title="You" pinColor="#2E7D32" />
 
-        {/* Home marker — only when an order is active */}
         {activeOrder && (
           <Marker
             coordinate={{ latitude: activeOrder.latitude, longitude: activeOrder.longitude }}
-            title={activeOrder.homeLabel || activeOrder.label}
+            title={activeOrder.homeLabel}
             description={`₹${activeOrder.payout} · ${activeOrder.distanceKm} km`}
             pinColor="#FF5252"
           />
         )}
 
-        {/* Kiosk marker — only when a swap is required for the active order */}
         {swapStationUsed && (
           <Marker
             coordinate={{ latitude: swapStationUsed.latitude, longitude: swapStationUsed.longitude }}
@@ -224,8 +237,8 @@ export default function MapComponent({ activeOrder, batteryPercentage, onDriverL
         <View style={styles.banner}>
           <Text style={styles.bannerText}>
             {swapRequired
-              ? `⚠ Battery swap needed en route to ${activeOrder.homeLabel || activeOrder.label}`
-              : `✓ Sufficient charge for ${activeOrder.homeLabel || activeOrder.label}`}
+              ? `⚠ Battery swap needed en route to ${activeOrder.homeLabel}`
+              : `✓ Sufficient charge for ${activeOrder.homeLabel}`}
           </Text>
           {roadRoute?.distanceMeters != null && roadRoute?.durationSeconds != null && (
             <Text style={styles.bannerSubtext}>

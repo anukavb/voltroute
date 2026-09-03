@@ -1,4 +1,5 @@
 // src/logic/routing.js
+import { SWAP_STATIONS } from '../data/orders';
 
 function haversineDistance(a, b) {
   const R = 6371;

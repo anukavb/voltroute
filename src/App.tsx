@@ -1,23 +1,31 @@
-/**
- * Live Ops — Expo Root Entry
- *
- * Run with:
- *   npx expo start
- *
- * Required packages (beyond a fresh Expo install):
- *   npx expo install @expo/vector-icons
- *   (included in every Expo SDK by default)
- */
-
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import HomeScreen from './components/screens/HomeScreen';
 import DriverProfileScreen from './components/screens/DriverProfileScreen';
+import { useBatterySim } from './hooks/useBatterySim';
+import { ORDERS } from './data/orders';
 import type { AppScreen, NavTab } from './components/types';
 
 export default function App() {
   const [screen, setScreen] = useState<AppScreen>('home');
   const [activeTab, setActiveTab] = useState<NavTab>('home');
+  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+  const [acceptedIds, setAcceptedIds] = useState<Set<string>>(new Set());
+  const [driverLocation, setDriverLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  const { battery, drainNow } = useBatterySim();
+  const activeDestination = ORDERS.find((o) => o.id === activeOrderId) || null;
+
+  function handleAcceptOrder(id: string) {
+    setAcceptedIds((prev) => new Set(prev).add(id));
+    setActiveOrderId(id);
+  }
+
+  function handleConfirmHome() {
+    setScreen('home');
+    setActiveTab('home');
+  }
 
   function handleTabPress(tab: NavTab) {
     if (tab === 'fleet') {
@@ -35,17 +43,33 @@ export default function App() {
   }
 
   return (
-    <>
+    <SafeAreaProvider>
       <StatusBar style="dark" />
       {screen === 'home' ? (
-        <HomeScreen activeTab={activeTab} onTabPress={handleTabPress} />
+        <HomeScreen
+          activeTab={activeTab}
+          onTabPress={handleTabPress}
+          activeDestination={activeDestination}
+          batteryPercentage={battery}
+          drainNow={drainNow}
+          driverLocation={driverLocation}
+          onDriverLocation={setDriverLocation}
+          acceptedIds={acceptedIds}
+        />
       ) : (
         <DriverProfileScreen
           onBack={handleBack}
           activeTab={activeTab}
           onTabPress={handleTabPress}
+          batteryPercentage={battery}
+          activeOrder={activeDestination}
+          drainNow={drainNow}
+          driverLocation={driverLocation}
+          acceptedIds={acceptedIds}
+          onAccept={handleAcceptOrder}
+          onConfirmHome={handleConfirmHome}
         />
       )}
-    </>
+    </SafeAreaProvider>
   );
 }

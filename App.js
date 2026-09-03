@@ -9,14 +9,14 @@ import { StatusBar } from 'expo-status-bar';
 
 import MapComponent from './src/components/MapComponent';
 import { useBatterySim } from './src/hooks/useBatterySim';
-import { DELIVERY_DESTINATIONS } from './src/data/mockData';
+import { ORDERS } from './src/data/orders';
 
 export default function App() {
   const { battery, isDraining, pauseDrain, resumeDrain } = useBatterySim();
   const [activeOrderId, setActiveOrderId] = useState(null);
   const [driverCoords, setDriverCoords] = useState(null);
 
-  const activeOrder = DELIVERY_DESTINATIONS.find((o) => o.id === activeOrderId) || null;
+  const activeOrder = ORDERS.find((o) => o.id === activeOrderId) || null;
 
   return (
     <View style={styles.container}>

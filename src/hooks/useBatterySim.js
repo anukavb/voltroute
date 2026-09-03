@@ -1,29 +1,14 @@
-// src/hooks/useBatterySim.js
+import { useState, useCallback } from 'react';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-
-const START_BATTERY = 25;
+const START_BATTERY = 38;
 const FLOOR_BATTERY = 5;
-const DRAIN_INTERVAL_MS = 10000;
-const DRAIN_AMOUNT = 1;
+const DRAIN_AMOUNT = 4;
 
 export function useBatterySim() {
   const [battery, setBattery] = useState(START_BATTERY);
-  const [isDraining, setIsDraining] = useState(true);
-  const intervalRef = useRef(null);
-
-  useEffect(() => {
-    if (isDraining) {
-      intervalRef.current = setInterval(() => {
-        setBattery((prev) => Math.max(prev - DRAIN_AMOUNT, FLOOR_BATTERY));
-      }, DRAIN_INTERVAL_MS);
-    }
-    return () => clearInterval(intervalRef.current);
-  }, [isDraining]);
-
-  const pauseDrain = useCallback(() => setIsDraining(false), []);
-  const resumeDrain = useCallback(() => setIsDraining(true), []);
+  const drainNow = useCallback(() => {
+    setBattery((prev) => Math.max(prev - DRAIN_AMOUNT, FLOOR_BATTERY));
+  }, []);
   const resetBattery = useCallback(() => setBattery(START_BATTERY), []);
-
-  return { battery, isDraining, pauseDrain, resumeDrain, resetBattery };
+  return { battery, drainNow, resetBattery };
 }

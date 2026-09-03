@@ -1,4 +1,6 @@
 import type { KPI, Order, AvailableOrder, Vehicle } from './types';
+import { availableOrders } from '../data/orders';
+export { availableOrders };
 
 export const COLORS = {
   bg: '#FFFFFF',
@@ -52,95 +54,10 @@ export const vehicles: Vehicle[] = [
 ];
 
 export const orders: Order[] = [
-  {
-    id: 'ORD-00412',
-    pickup: 'Terminal 3, Airport Rd',
-    drop: '14 Marina Bay St',
-    distance: '12.4 km',
-    payout: '$18.50',
-    status: 'Assigned',
-  },
-  {
-    id: 'ORD-00413',
-    pickup: 'Central Park Ave, N12',
-    drop: 'Westfield Mall, W4',
-    distance: '7.1 km',
-    payout: '$11.00',
-    status: 'Pending',
-  },
-  {
-    id: 'ORD-00409',
-    pickup: 'Harbor Dock Gate B',
-    drop: 'Eastside Depot, E3',
-    distance: '5.8 km',
-    payout: '$9.75',
-    status: 'Picked Up',
-  },
-  {
-    id: 'ORD-00414',
-    pickup: 'Union Station, Level 1',
-    drop: 'Northgate Plaza, N8',
-    distance: '9.2 km',
-    payout: '$14.20',
-    status: 'Pending',
-  },
-  {
-    id: 'ORD-00410',
-    pickup: 'Skyline Tower, S1',
-    drop: 'Greenview Suburb, G7',
-    distance: '16.3 km',
-    payout: '$22.80',
-    status: 'Assigned',
-  },
-  {
-    id: 'ORD-00408',
-    pickup: 'Riverside Market, RM2',
-    drop: 'Old Town Square, OT5',
-    distance: '3.5 km',
-    payout: '$7.00',
-    status: 'Picked Up',
-  },
-];
-
-export const availableOrders: AvailableOrder[] = [
-  {
-    id: 'ORD-00420',
-    payout: '$12.50',
-    pickupKm: 2.4,
-    deliveryKm: 4.1,
-    pickupAddr: 'Central Station, Platform 3',
-    dropAddr: 'Westfield Mall, Gate A',
-  },
-  {
-    id: 'ORD-00421',
-    payout: '$18.00',
-    pickupKm: 5.2,
-    deliveryKm: 9.8,
-    pickupAddr: 'Harbor Dock Gate B',
-    dropAddr: 'Tech Park East, E2',
-  },
-  {
-    id: 'ORD-00422',
-    payout: '$28.75',
-    pickupKm: 8.5,
-    deliveryKm: 12.3,
-    pickupAddr: 'North Logistics Depot',
-    dropAddr: 'Sunrise Suburb, Block 7',
-  },
-  {
-    id: 'ORD-00423',
-    payout: '$9.90',
-    pickupKm: 3.1,
-    deliveryKm: 7.2,
-    pickupAddr: 'Airport Terminal 2',
-    dropAddr: 'City Center, Main Sq',
-  },
-  {
-    id: 'ORD-00424',
-    payout: '$31.50',
-    pickupKm: 6.8,
-    deliveryKm: 14.5,
-    pickupAddr: 'Marina Bay Warehouse',
-    dropAddr: 'Greenview Hills, GH-14',
-  },
+  { id: 'ORD-00412', pickup: 'Terminal 3, Airport Rd', drop: '14 Marina Bay St', distance: '12.4 km', payout: '₹850', status: 'Assigned' },
+  { id: 'ORD-00413', pickup: 'Central Park Ave, N12', drop: 'Westfield Mall, W4', distance: '7.1 km', payout: '₹520', status: 'Pending' },
+  { id: 'ORD-00409', pickup: 'Harbor Dock Gate B', drop: 'Eastside Depot, E3', distance: '5.8 km', payout: '₹410', status: 'Picked Up' },
+  { id: 'ORD-00414', pickup: 'Union Station, Level 1', drop: 'Northgate Plaza, N8', distance: '9.2 km', payout: '₹650', status: 'Pending' },
+  { id: 'ORD-00410', pickup: 'Skyline Tower, S1', drop: 'Greenview Suburb, G7', distance: '16.3 km', payout: '₹980', status: 'Assigned' },
+  { id: 'ORD-00408', pickup: 'Riverside Market, RM2', drop: 'Old Town Square, OT5', distance: '3.5 km', payout: '₹320', status: 'Picked Up' },
 ];
