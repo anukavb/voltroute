@@ -55,10 +55,11 @@ interface AvailableOrderCardProps {
   order: AvailableOrder;
   batteryPercentage: number;
   onAccept: (id: string) => void;
+  onPreviewSwapRoute: (id: string) => void;
   onReject: (id: string) => void;
 }
 
-function AvailableOrderCard({ order, batteryPercentage, onAccept, onReject }: AvailableOrderCardProps) {
+function AvailableOrderCard({ order, batteryPercentage, onAccept, onPreviewSwapRoute, onReject }: AvailableOrderCardProps) {
   const totalKm = order.pickupKm + order.deliveryKm;
   const safety = evaluateOrderSafety(totalKm, batteryPercentage);
   const isSufficient = !safety.swapRequired;
@@ -113,7 +114,7 @@ function AvailableOrderCard({ order, batteryPercentage, onAccept, onReject }: Av
           {!isSufficient && (
             <>
               <Text style={styles.tooLowText}>Battery too low to complete this delivery safely.</Text>
-              <Pressable style={styles.swapLink} onPress={() => {}}>
+              <Pressable style={styles.swapLink} onPress={() => onPreviewSwapRoute(order.id)}>
                 <Ionicons name="swap-horizontal-outline" size={11} color={COLORS.blue} />
                 <Text style={styles.swapLinkText}>View swap-station detour</Text>
               </Pressable>
@@ -138,11 +139,12 @@ interface DriverProfileScreenProps {
   driverLocation: { latitude: number; longitude: number } | null;
   acceptedIds: Set<string>;
   onAccept: (id: string) => void;
+  onPreviewSwapRoute: (id: string) => void;
   onConfirmHome: () => void;
 }
 
 export default function DriverProfileScreen({
-  onBack, activeTab, onTabPress, batteryPercentage, activeOrder, drainNow, driverLocation, onAccept, onConfirmHome,
+  onBack, activeTab, onTabPress, batteryPercentage, activeOrder, drainNow, driverLocation, onAccept, onPreviewSwapRoute, onConfirmHome,
 }: DriverProfileScreenProps) {
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [accepted, setAccepted] = useState<Set<string>>(new Set());
@@ -280,6 +282,7 @@ export default function DriverProfileScreen({
                 order={order}
                 batteryPercentage={batteryPercentage}
                 onAccept={handleAccept}
+                onPreviewSwapRoute={onPreviewSwapRoute}
                 onReject={handleReject}
               />
             ))}

@@ -22,6 +22,10 @@ export default function App() {
     setActiveOrderId(id);
   }
 
+  function handlePreviewSwapRoute(id: string) {
+    setActiveOrderId(id);
+  }
+
   function handleConfirmHome() {
     setScreen('home');
     setActiveTab('home');
@@ -67,6 +71,7 @@ export default function App() {
           driverLocation={driverLocation}
           acceptedIds={acceptedIds}
           onAccept={handleAcceptOrder}
+          onPreviewSwapRoute={handlePreviewSwapRoute}
           onConfirmHome={handleConfirmHome}
         />
       )}
